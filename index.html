@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>마음 한 줄 명언</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;600&display=swap">
+<style>
+/* Layout: 상단에 큰 감정 버튼 4개(모바일 2x2, 넓은 화면 1x4), 아래에 명언 카드 한 장 */
+:root {
+  --bg: #F3F4F1;
+  --surface: #FFFFFF;
+  --ink: #26302E;
+  --muted: #5B6764;
+  --line: #D6DCD8;
+  --joy-soft: #F6EBD3;   --joy-deep: #7E5A1A;
+  --sad-soft: #DCE8F3;   --sad-deep: #3A5F80;
+  --tired-soft: #DDEBE1; --tired-deep: #38644D;
+  --anx-soft: #E7E3F3;   --anx-deep: #594F8C;
+  --font-body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-quote: "Noto Serif KR", "Nanum Myeongjo", "Batang", serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #171B1D; --surface: #20262A; --ink: #E8ECEA; --muted: #A5B0AC; --line: #343C40;
+    --joy-soft: #3A3322;   --joy-deep: #E6C47E;
+    --sad-soft: #22313E;   --sad-deep: #9EC2E2;
+    --tired-soft: #23352A; --tired-deep: #A1D2B5;
+    --anx-soft: #2E2A41;   --anx-deep: #C4BBEC;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #171B1D; --surface: #20262A; --ink: #E8ECEA; --muted: #A5B0AC; --line: #343C40;
+  --joy-soft: #3A3322;   --joy-deep: #E6C47E;
+  --sad-soft: #22313E;   --sad-deep: #9EC2E2;
+  --tired-soft: #23352A; --tired-deep: #A1D2B5;
+  --anx-soft: #2E2A41;   --anx-deep: #C4BBEC;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.6;
+  padding-block: 28px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 860px; margin: 0 auto; display: grid; gap: 24px; }
+
+header { display: grid; gap: 6px; }
+h1 {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-size: clamp(1.6rem, 4.5vw, 2.1rem);
+  font-weight: 600;
+  text-wrap: balance;
+}
+.lead { margin: 0; font-size: clamp(1.1rem, 3vw, 1.3rem); color: var(--muted); }
+
+/* 감정 버튼 */
+.moods { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 820px) { .moods { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.mood {
+  appearance: none;
+  font: inherit;
+  color: var(--ink);
+  background: var(--soft);
+  border: 3px solid transparent;
+  border-radius: 18px;
+  min-height: 104px;
+  padding: 14px 10px;
+  display: grid;
+  place-content: center;
+  gap: 2px;
+  text-align: center;
+  font-size: clamp(1.3rem, 4.2vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: border-color .2s, transform .15s;
+}
+.mood span { display: block; }
+.mood:hover { border-color: var(--deep); }
+.mood:active { transform: scale(.98); }
+.mood[aria-pressed="true"] { border-color: var(--deep); box-shadow: inset 0 0 0 2px var(--deep); }
+.mood:focus-visible, .next:focus-visible { outline: 4px solid var(--deep, var(--ink)); outline-offset: 3px; }
+
+.b-joy   { --soft: var(--joy-soft);   --deep: var(--joy-deep); }
+.b-sad   { --soft: var(--sad-soft);   --deep: var(--sad-deep); }
+.b-tired { --soft: var(--tired-soft); --deep: var(--tired-deep); }
+.b-anx   { --soft: var(--anx-soft);   --deep: var(--anx-deep); }
+
+/* 명언 카드 */
+.card {
+  background: var(--soft, var(--surface));
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: clamp(24px, 6vw, 48px) clamp(20px, 5vw, 44px);
+  display: grid;
+  gap: 22px;
+  min-height: 320px;
+  align-content: center;
+}
+.card[data-emotion="joy"]   { --soft: var(--joy-soft);   --deep: var(--joy-deep); }
+.card[data-emotion="sad"]   { --soft: var(--sad-soft);   --deep: var(--sad-deep); }
+.card[data-emotion="tired"] { --soft: var(--tired-soft); --deep: var(--tired-deep); }
+.card[data-emotion="anx"]   { --soft: var(--anx-soft);   --deep: var(--anx-deep); }
+
+.tag { margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--deep, var(--muted)); letter-spacing: .02em; }
+.quote {
+  margin: 0;
+  font-family: var(--font-quote);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.7;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+  transition: opacity .35s ease;
+}
+.quote.fade { opacity: 0; }
+.author { margin: 0; font-size: clamp(1.15rem, 3.4vw, 1.4rem); font-weight: 500; color: var(--deep, var(--muted)); }
+.author:empty { display: none; }
+
+.next {
+  appearance: none;
+  font: inherit;
+  font-size: clamp(1.2rem, 3.6vw, 1.4rem);
+  font-weight: 700;
+  justify-self: start;
+  min-height: 64px;
+  padding: 14px 32px;
+  border-radius: 999px;
+  border: 3px solid var(--deep);
+  background: var(--surface);
+  color: var(--deep);
+  cursor: pointer;
+}
+.next:hover { background: var(--deep); color: var(--surface); }
+@media (max-width: 520px) { .next { justify-self: stretch; } }
+
+.note { margin: 0; font-size: .95rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .quote, .mood { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>마음 한 줄 명언</h1>
+    <p class="lead">오늘 느낀 감정을 하나 골라 주세요.</p>
+  </header>
+
+  <div class="moods" role="group" aria-label="오늘 느낀 감정">
+    <button class="mood b-joy" id="btn-joy" data-key="joy" aria-pressed="false"><span>기쁘고</span><span>행복함</span></button>
+    <button class="mood b-sad" id="btn-sad" data-key="sad" aria-pressed="false"><span>슬프고</span><span>우울함</span></button>
+    <button class="mood b-tired" id="btn-tired" data-key="tired" aria-pressed="false"><span>지치고</span><span>번아웃</span></button>
+    <button class="mood b-anx" id="btn-anx" data-key="anx" aria-pressed="false"><span>불안하고</span><span>스트레스</span></button>
+  </div>
+
+  <section class="card" id="card" data-emotion="" aria-live="polite">
+    <p class="tag" id="tag">오늘의 한마디</p>
+    <p class="quote" id="quote">오늘 마음은 어떠신가요? 위의 버튼 중 지금 마음과 가까운 것을 눌러 보세요.</p>
+    <p class="author" id="author"></p>
+    <button class="next" id="next" hidden>다른 명언 보기</button>
+  </section>
+
+  <p class="note">명언은 전해 내려오는 말을 우리말로 옮긴 것입니다.</p>
+</div>
+
+<script>
+var DATA = {
+  joy: {
+    tag: "기쁜 마음에 건네는 한마디",
+    items: [
+      ["행복은 습관이다. 그것을 몸에 지니라.", "엘버트 허버드"],
+      ["감사하는 마음은 가장 큰 미덕일 뿐 아니라 모든 미덕의 어버이다.", "키케로"],
+      ["가장 낭비된 날은 웃지 않고 보낸 날이다.", "샹포르"],
+      ["행복은 인생의 의미이자 목적이며, 삶의 궁극적인 목표다.", "아리스토텔레스"],
+      ["웃으면 복이 온다.", "한국 속담"],
+      ["웃는 낯에 침 뱉으랴.", "한국 속담"],
+      ["가장 적은 것으로 만족하는 사람이 가장 부유한 사람이다.", "소크라테스"],
+      ["세상에서 가장 아름답고 좋은 것은 보거나 만질 수 없다. 오직 가슴으로 느낄 수 있을 뿐이다.", "헬렌 켈러"],
+      ["족함을 아는 사람이 진짜 부유한 사람이다.", "노자"],
+      ["아는 것은 좋아하는 것만 못하고, 좋아하는 것은 즐기는 것만 못하다.", "공자"],
+      ["배우고 때때로 익히니, 또한 기쁘지 아니한가.", "공자"],
+      ["벗이 먼 곳에서 찾아오니, 또한 즐겁지 아니한가.", "공자"],
+      ["비관은 기분에서 나오고, 낙관은 의지에서 나온다.", "알랭"],
+      ["행복한 사람은 다른 사람도 행복하게 만든다.", "안네 프랑크"],
+      ["기쁨은 나누면 배가 되고, 슬픔은 나누면 반이 된다.", "오래된 격언"],
+      ["한 번 웃으면 한 번 젊어지고, 한 번 화내면 한 번 늙는다.", "일소일소 일노일노"],
+      ["웃는 집에는 온갖 복이 찾아온다.", "소문만복래"],
+      ["참된 기쁨은 진지하고 깊은 것이다.", "세네카"],
+      ["가장 확실한 지혜의 표시는 변함없는 명랑함이다.", "몽테뉴"],
+      ["마음의 즐거움은 좋은 약이다.", "잠언"],
+      ["갖지 못한 것을 슬퍼하지 않고, 가진 것을 기뻐하는 사람이 지혜로운 사람이다.", "에픽테토스"],
+      ["작은 것에 감사할 줄 아는 사람은 큰 것도 누릴 줄 안다.", "오래된 격언"]
+    ]
+  },
+  sad: {
+    tag: "슬픈 마음에 건네는 한마디",
+    items: [
+      ["이 또한 지나가리라.", "페르시아 격언"],
+      ["가장 어두운 밤이 지나면 새벽이 온다.", "오래된 격언"],
+      ["비 온 뒤에 땅이 굳는다.", "한국 속담"],
+      ["쥐구멍에도 볕 들 날이 있다.", "한국 속담"],
+      ["고생 끝에 낙이 온다.", "한국 속담"],
+      ["하늘이 무너져도 솟아날 구멍이 있다.", "한국 속담"],
+      ["시간이 약이다.", "한국 속담"],
+      ["영혼은 시련과 고통을 겪으면서 비로소 강해진다.", "헬렌 켈러"],
+      ["나를 죽이지 못하는 고통은 나를 더 강하게 만든다.", "니체"],
+      ["상처는 빛이 당신 안으로 들어오는 자리다.", "루미"],
+      ["왜 살아야 하는지 아는 사람은 어떤 어려움도 견딜 수 있다.", "니체"],
+      ["한겨울 한복판에서, 나는 내 안에 여름이 있음을 깨달았다.", "알베르 카뮈"],
+      ["모든 시작에는 마법이 깃들어 있다.", "헤르만 헤세"],
+      ["희망은 영혼 속에 둥지를 튼, 깃털 달린 존재다.", "에밀리 디킨슨"],
+      ["눈물 젖은 빵을 먹어 보지 않은 사람은 인생의 참맛을 모른다.", "괴테"],
+      ["구름 뒤에는 언제나 태양이 빛나고 있다.", "롱펠로"],
+      ["삶이 그대를 속일지라도 슬퍼하거나 노여워하지 말라. 슬픈 날을 참고 견디면 기쁜 날이 오리니.", "푸시킨"],
+      ["아침이 오지 않는 밤은 없다.", "셰익스피어"],
+      ["슬픔이 존재 깊이 파고들수록, 우리는 더 많은 기쁨을 담을 수 있다.", "칼릴 지브란"],
+      ["겨울이 오면, 봄이 어찌 멀겠는가.", "셸리"],
+      ["기쁨과 슬픔은 늘 함께 찾아온다. 하나가 식탁에 앉아 있을 때, 다른 하나는 침대에서 잠들어 있다.", "칼릴 지브란"],
+      ["개똥밭에 굴러도 이승이 좋다.", "한국 속담"]
+    ]
+  },
+  tired: {
+    tag: "지친 마음에 건네는 한마디",
+    items: [
+      ["급할수록 돌아가라.", "한국 속담"],
+      ["천 리 길도 한 걸음부터 시작된다.", "노자"],
+      ["멈출 줄 알면 위태롭지 않다.", "노자"],
+      ["가끔 나무 아래 풀밭에 누워 하늘을 올려다보는 것은 결코 시간 낭비가 아니다.", "존 러벅"],
+      ["쉬어라. 쉬고 난 밭에서 더 풍성한 수확이 난다.", "오비디우스"],
+      ["빨리 가려고 하면 오히려 닿지 못한다.", "공자"],
+      ["사람들은 쓸모 있는 것의 쓸모만 알고, 쓸모없는 것의 쓸모는 알지 못한다.", "장자"],
+      ["백지장도 맞들면 낫다.", "한국 속담"],
+      ["때때로 쉬어라. 잠시 일에서 떨어졌다 돌아오면 판단이 더 분명해진다.", "레오나르도 다빈치"],
+      ["밧줄 끝에 다다랐다면, 매듭을 묶고 매달려라.", "프랭클린 루스벨트"],
+      ["잠은 근심으로 엉킨 실타래를 풀어 준다.", "셰익스피어"],
+      ["일곱 번 넘어져도 여덟 번째 일어나면 된다.", "일본 속담"],
+      ["거의 모든 것은 전원을 껐다 다시 켜면 다시 작동합니다. 당신도 마찬가지입니다.", "앤 라모트"],
+      ["가장 훌륭한 것은 물과 같다. 다투지 않고 흐르며 만물을 이롭게 한다.", "노자"],
+      ["시작이 반이다.", "한국 속담"],
+      ["낙숫물이 댓돌을 뚫는다.", "한국 속담"],
+      ["급히 먹는 밥이 체한다.", "한국 속담"],
+      ["로마는 하루아침에 이루어지지 않았다.", "오래된 격언"],
+      ["별처럼 서두르지 말고, 그러나 쉬지도 말라.", "괴테"],
+      ["천천히 서둘러라.", "아우구스투스"],
+      ["우리는 시지프가 행복하다고 상상해야 한다.", "알베르 카뮈"],
+      ["지나침은 모자람과 같다.", "공자"]
+    ]
+  },
+  anx: {
+    tag: "불안한 마음에 건네는 한마디",
+    items: [
+      ["걱정은 내일의 슬픔을 덜어 주지 못한다. 오늘의 힘만 빼앗을 뿐이다.", "코리 텐 붐"],
+      ["우리가 두려워해야 할 것은 두려움 그 자체뿐이다.", "프랭클린 루스벨트"],
+      ["우리는 현실에서보다 상상 속에서 더 자주 괴로워한다.", "세네카"],
+      ["어떤 일은 우리 힘에 달려 있고, 어떤 일은 그렇지 않다.", "에픽테토스"],
+      ["바깥의 일 때문에 괴롭다면, 그 괴로움은 일 자체가 아니라 그것에 대한 당신의 판단 때문이다.", "마르쿠스 아우렐리우스"],
+      ["바꿀 수 없는 것은 받아들이는 평온을, 바꿀 수 있는 것은 바꾸는 용기를, 그리고 그 둘을 구별하는 지혜를 주소서.", "라인홀드 니버"],
+      ["고요함은 소란함의 주인이다.", "노자"],
+      ["호랑이에게 물려가도 정신만 차리면 산다.", "한국 속담"],
+      ["걱정도 팔자라고 했다. 오늘은 걱정 하나를 내려놓아도 좋다.", "한국 속담"],
+      ["숨을 들이쉬며 내 몸이 고요해짐을 느끼고, 숨을 내쉬며 미소 짓는다.", "틱낫한"],
+      ["때로는 기쁨이 미소의 원천이지만, 때로는 미소가 기쁨의 원천이 된다.", "틱낫한"],
+      ["파도를 멈출 수는 없지만, 파도타기를 배울 수는 있다.", "존 카밧진"],
+      ["가장 강한 전사는 시간과 인내다.", "톨스토이"],
+      ["마음가짐을 바꾸면 삶을 바꿀 수 있다. 이것이 우리 시대의 가장 위대한 발견이다.", "윌리엄 제임스"],
+      ["내일 일은 내일 염려하라. 한 날의 괴로움은 그날로 족하다.", "마태복음"],
+      ["사람들을 괴롭히는 것은 사물 자체가 아니라, 그것에 대한 생각이다.", "에픽테토스"],
+      ["과거를 쫓지 말고 미래를 바라지 말라. 지금 이 자리에서 깨어 있으라.", "부처"],
+      ["불안은 자유의 현기증이다.", "키르케고르"],
+      ["당신의 마음은 당신이 자주 하는 생각의 색으로 물든다.", "마르쿠스 아우렐리우스"],
+      ["참을 인(忍) 자 셋이면 살인도 면한다.", "한국 속담"],
+      ["군자는 마음이 평온하고 넓으며, 소인은 늘 근심에 매여 있다.", "공자"],
+      ["인생에 대해 배운 모든 것은 한마디로 줄일 수 있다. 삶은 계속된다.", "로버트 프로스트"]
+    ]
+  }
+};
+
+var card = document.getElementById("card");
+var tagEl = document.getElementById("tag");
+var quoteEl = document.getElementById("quote");
+var authorEl = document.getElementById("author");
+var nextBtn = document.getElementById("next");
+var buttons = document.querySelectorAll(".mood");
+var current = null;
+var bags = {};
+var lastShown = {};
+
+function refill(key) {
+  var n = DATA[key].items.length;
+  var idx = [];
+  for (var i = 0; i < n; i++) idx.push(i);
+  for (var j = n - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var t = idx[j]; idx[j] = idx[k]; idx[k] = t;
+  }
+  // 새로 섞은 뒤 첫 명언이 직전 명언과 같지 않게 한다
+  if (idx[idx.length - 1] === lastShown[key] && n > 1) {
+    var s = idx[0]; idx[0] = idx[idx.length - 1]; idx[idx.length - 1] = s;
+  }
+  bags[key] = idx;
+}
+
+function pick(key) {
+  if (!bags[key] || bags[key].length === 0) refill(key);
+  var i = bags[key].pop();
+  lastShown[key] = i;
+  return DATA[key].items[i];
+}
+
+function show(key) {
+  var q = pick(key);
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var apply = function () {
+    card.setAttribute("data-emotion", key);
+    tagEl.textContent = DATA[key].tag;
+    quoteEl.textContent = q[0];
+    authorEl.textContent = "― " + q[1];
+    nextBtn.hidden = false;
+    quoteEl.classList.remove("fade");
+  };
+  if (reduce) { apply(); return; }
+  quoteEl.classList.add("fade");
+  setTimeout(apply, 250);
+}
+
+buttons.forEach(function (b) {
+  b.addEventListener("click", function () {
+    current = b.getAttribute("data-key");
+    buttons.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    show(current);
+  });
+});
+nextBtn.addEventListener("click", function () { if (current) show(current); });
+</script>
+
+</body>
+</html>
